@@ -8,6 +8,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PHONE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_REMARK;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
+import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
 
 import java.util.Optional;
 import java.util.Set;
@@ -54,7 +55,7 @@ public class FindPatientCommandParser implements Parser<FindPatientCommand> {
         if (argMultimap.getValue(PREFIX_NAME).isPresent()) {
             String trimmedArgs = ParserUtil.parseName(argMultimap.getValue(PREFIX_NAME).get()).toString().trim();
 
-            final String finalPredicateString = createPredicateString(trimmedArgs);
+            final String finalPredicateString = ParserUtil.createPredicateString(trimmedArgs);
 
             Predicate<Name> namePredicate = (name -> name.fullName.toLowerCase()
                     .contains(finalPredicateString.toLowerCase()));
@@ -87,7 +88,7 @@ public class FindPatientCommandParser implements Parser<FindPatientCommand> {
                 throw new ParseException("Input for finding by email should not be empty");
             }
 
-            final String finalPredicateString = createPredicateString(trimmedArgs);
+            final String finalPredicateString = ParserUtil.createPredicateString(trimmedArgs);
 
             Predicate<Email> emailPredicate = (email -> email.value.toLowerCase()
                     .contains(finalPredicateString.toLowerCase()));
@@ -101,7 +102,7 @@ public class FindPatientCommandParser implements Parser<FindPatientCommand> {
         if (argMultimap.getValue(PREFIX_ADDRESS).isPresent()) {
             String trimmedArgs = ParserUtil.parseAddress(argMultimap.getValue(PREFIX_ADDRESS).get()).toString().trim();
 
-            final String finalPredicateString = createPredicateString(trimmedArgs);
+            final String finalPredicateString = ParserUtil.createPredicateString(trimmedArgs);
 
             Predicate<Address> addressPredicate = (address -> address.toString().toLowerCase()
                     .contains(finalPredicateString.toLowerCase()));
@@ -119,7 +120,7 @@ public class FindPatientCommandParser implements Parser<FindPatientCommand> {
                 throw new ParseException("Input for finding by remark should not be empty");
             }
 
-            final String finalPredicateString = createPredicateString(trimmedArgs);
+            final String finalPredicateString = ParserUtil.createPredicateString(trimmedArgs);
 
             Predicate<Remark> remarkPredicate = (remark -> remark.toString().toLowerCase()
                     .contains(finalPredicateString.toLowerCase()));
@@ -145,30 +146,5 @@ public class FindPatientCommandParser implements Parser<FindPatientCommand> {
         return new FindPatientCommand(finalNamePredicate, finalPhonePredicate, finalEmailPredicate,
                 finalAddressPredicate, finalTagPredicate, finalRemarkPredicate);
 
-    }
-
-    /**
-     * Returns true if any of the prefixes contains non-empty {@code Optional} values in the given
-     * {@code ArgumentMultimap}.
-     */
-    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
-        return Stream.of(prefixes).anyMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
-    }
-
-    /**
-     * Returns the predicate string to be used in the predicate.
-     *
-     * @param trimmedArgs The trimmed arguments.
-     * @return The predicate string.
-     */
-    public String createPredicateString(String trimmedArgs) {
-        String[] keywords = trimmedArgs.split("\\s+");
-
-        String predicateString = keywords[0];
-        for (int i = 1; i < keywords.length; i++) {
-            predicateString += " " + keywords[i];
-        }
-
-        return predicateString;
     }
 }

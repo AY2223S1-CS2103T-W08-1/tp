@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.core.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_PAYMENT_STATUS;
+import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
 
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -65,13 +66,5 @@ public class FindBillCommandParser implements Parser<FindBillCommand> {
         }
 
         return new FindBillCommand(this.predicate);
-    }
-
-    /**
-     * Returns true if any of the prefixes contain non-empty {@code Optional} values in the given
-     * {@code ArgumentMultimap}.
-     */
-    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
-        return Stream.of(prefixes).anyMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
     }
 }

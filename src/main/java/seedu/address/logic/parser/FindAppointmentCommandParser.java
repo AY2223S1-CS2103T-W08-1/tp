@@ -6,7 +6,10 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_DOCTOR;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_MEDICAL_TEST;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_SLOT;
+import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
+import static seedu.address.logic.parser.ParserUtil.createPredicateString;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -22,10 +25,10 @@ import seedu.address.model.patient.Name;
  * Parses input arguments and creates a new FindAppointmentCommand object
  */
 public class FindAppointmentCommandParser implements Parser<FindAppointmentCommand> {
-    private Predicate<Name> namePredicate = null;
-    private Predicate<MedicalTest> testPredicate = null;
-    private Predicate<Slot> slotPredicate = null;
-    private Predicate<Doctor> doctorPredicate = null;
+    private Optional<Predicate<Name>> namePredicate;
+    private Optional<Predicate<MedicalTest>> testPredicate;
+    private Optional<Predicate<Slot>> slotPredicate;
+    private Optional<Predicate<Doctor>> doctorPredicate;
 
     /**
      * Parses the given {@code String} of arguments in the context of the FindAppointmentCommand
@@ -43,87 +46,25 @@ public class FindAppointmentCommandParser implements Parser<FindAppointmentComma
                     String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindAppointmentCommand.MESSAGE_USAGE));
         }
 
-        if (argMultimap.getValue(PREFIX_NAME).isPresent()) {
-            String trimmedArgs = ParserUtil.parseName(argMultimap.getValue(PREFIX_NAME).get()).toString().trim();
+        this.namePredicate = argMultimap.getValue(PREFIX_NAME)
+                .map(s -> s.trim())
+                .map(s -> createPredicateString(s))
+                .map(s -> name -> name.fullName.toLowerCase().contains(s.toLowerCase()));
 
-            final String finalPredicateString = createPredicateString(trimmedArgs);
+        this.testPredicate = argMultimap.getValue(PREFIX_MEDICAL_TEST)
+                .map(s -> s.trim())
+                .map(s -> createPredicateString(s))
+                .map(s -> test -> test.toString().toLowerCase().contains(s.toLowerCase()));
 
-            Predicate<Name> namePredicate = (name -> name.fullName.toLowerCase()
-                    .contains(finalPredicateString.toLowerCase()));
+        this.slotPredicate = argMultimap.getValue(PREFIX_SLOT)
+                .map(s -> s.trim())
+                .map(s -> slot -> slot.toString().toLowerCase().contains(s.toLowerCase()));
 
-            this.namePredicate = namePredicate;
-        }
+        this.doctorPredicate = argMultimap.getValue(PREFIX_DOCTOR)
+                .map(s -> s.trim())
+                .map(s -> createPredicateString(s))
+                .map(s -> doctor -> doctor.toString().toLowerCase().contains(s.toLowerCase()));
 
-        Optional<Predicate<Name>> finalNamePredicate = Optional.ofNullable(this.namePredicate);
-
-        if (argMultimap.getValue(PREFIX_MEDICAL_TEST).isPresent()) {
-            String trimmedArgs = ParserUtil.parseMedicalTest(argMultimap.getValue(PREFIX_MEDICAL_TEST).get())
-                    .toString().trim();
-
-            final String finalPredicateString = createPredicateString(trimmedArgs);
-
-            Predicate<MedicalTest> testPredicate = (test -> test.toString().toLowerCase()
-                    .contains(finalPredicateString.toLowerCase()));
-
-            this.testPredicate = testPredicate;
-        }
-
-        Optional<Predicate<MedicalTest>> finalTestPredicate = Optional.ofNullable(this.testPredicate);
-
-        if (argMultimap.getValue(PREFIX_SLOT).isPresent()) {
-            String trimmedArgs = argMultimap.getValue(PREFIX_SLOT).get().trim();
-
-            if (!trimmedArgs.matches("^[0-9:-]+$")) {
-                throw new ParseException("Only numbers, - and : are allowed as input for finding by slot");
-            }
-
-            Predicate<Slot> slotPredicate = (slot -> slot.toString().contains(trimmedArgs.toLowerCase()));
-
-            this.slotPredicate = slotPredicate;
-        }
-
-        Optional<Predicate<Slot>> finalSlotPredicate = Optional.ofNullable(this.slotPredicate);
-
-        if (argMultimap.getValue(PREFIX_DOCTOR).isPresent()) {
-            String trimmedArgs = ParserUtil.parseDoctor(argMultimap.getValue(PREFIX_DOCTOR).get()).toString().trim();
-
-            final String finalPredicateString = createPredicateString(trimmedArgs);
-
-            Predicate<Doctor> doctorPredicate = (doctor -> doctor.toString().toLowerCase()
-                    .contains(finalPredicateString.toLowerCase()));
-
-            this.doctorPredicate = doctorPredicate;
-        }
-
-        Optional<Predicate<Doctor>> finalDoctorPredicate = Optional.ofNullable(this.doctorPredicate);
-
-        return new FindAppointmentCommand(finalNamePredicate, finalTestPredicate, finalSlotPredicate,
-                finalDoctorPredicate);
-
-    }
-
-    /**
-     * Returns true if any of the prefixes contain non-empty {@code Optional} values in the given
-     * {@code ArgumentMultimap}.
-     */
-    private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
-        return Stream.of(prefixes).anyMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
-    }
-
-    /**
-     * Returns the predicate string to be used in the predicate.
-     *
-     * @param trimmedArgs The trimmed arguments.
-     * @return The predicate string.
-     */
-    public String createPredicateString(String trimmedArgs) {
-        String[] keywords = trimmedArgs.split("\\s+");
-
-        String predicateString = keywords[0];
-        for (int i = 1; i < keywords.length; i++) {
-            predicateString += " " + keywords[i];
-        }
-
-        return predicateString;
+        return new FindAppointmentCommand(namePredicate, testPredicate, slotPredicate, doctorPredicate);
     }
 }

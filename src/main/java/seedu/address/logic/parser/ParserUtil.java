@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
@@ -230,5 +231,30 @@ public class ParserUtil {
             throw new ParseException(PaymentStatus.MESSAGE_CONSTRAINTS);
         }
         return new PaymentStatus(paymentStatus);
+    }
+
+    /**
+     * Returns the predicate string to be used in the predicate.
+     *
+     * @param trimmedArgs The trimmed arguments.
+     * @return The predicate string.
+     */
+    public static String createPredicateString(String trimmedArgs) {
+        String[] keywords = trimmedArgs.split("\\s+");
+
+        String predicateString = keywords[0];
+        for (int i = 1; i < keywords.length; i++) {
+            predicateString += " " + keywords[i];
+        }
+
+        return predicateString;
+    }
+
+    /**
+     * Returns true if any of the prefixes contain non-empty {@code Optional} values in the given
+     * {@code ArgumentMultimap}.
+     */
+    public static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
+        return Stream.of(prefixes).anyMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
     }
 }
