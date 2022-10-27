@@ -7,7 +7,6 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_PAYMENT_STATUS;
 import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
 
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import seedu.address.logic.commands.FindBillCommand;
 import seedu.address.logic.parser.exceptions.ParseException;

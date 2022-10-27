@@ -9,10 +9,8 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_SLOT;
 import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
 import static seedu.address.logic.parser.ParserUtil.createPredicateString;
 
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import seedu.address.logic.commands.FindAppointmentCommand;
 import seedu.address.logic.parser.exceptions.ParseException;

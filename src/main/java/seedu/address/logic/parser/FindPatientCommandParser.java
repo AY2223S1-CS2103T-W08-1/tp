@@ -13,7 +13,6 @@ import static seedu.address.logic.parser.ParserUtil.arePrefixesPresent;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import seedu.address.logic.commands.FindPatientCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
